@@ -53,9 +53,11 @@ namespace fingers{
             if (!cfg || !cfg.enabled){
                 return;
             }
+            
             if (cfg.onact){
                 cfg.onact(rg.inqueue);
             }
+            
             rg.parse(acts);
         }
 
@@ -64,7 +66,7 @@ namespace fingers{
                 return false;
             };
 
-            if (!MobileDevice.any){
+            if (!fingers.MobileDevice.any){
                 zs = new zoomsim();
                 os = new offsetsim();
                 document.addEventListener("mousedown", function(event){
