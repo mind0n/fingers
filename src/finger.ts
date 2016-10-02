@@ -1,5 +1,6 @@
 /// <reference path="touch.ts" />
 /// <reference path="zoomer.ts" />
+/// <reference path="elements.ts" />
 
 namespace fingers{
     function elAtPos(pos:number[]):any{
@@ -49,6 +50,11 @@ namespace fingers{
         var ft = settings.filter;
         
         cb(node);
+        if (!node.childNodes){
+            console.error("Unexpected target node:", node);
+            debugger;
+            return;
+        }
         for(let i=0; i<node.childNodes.length; i++){
             let cnode = node.childNodes[i];
             if (!ft || ft(cnode)){
@@ -62,39 +68,58 @@ namespace fingers{
         }
         return rlt;
     }
-
-    export function finger(el:any):any{
-        if (!cfg){
-            cfg = touch({
-                on:{ 
-                    tap:function(act:iact){
-                        activeEl = elAtPos(act.cpos);
-                    }
-                },onact:function(inq:any){
-                },onrecognized:function(act:iact){
-                    if (activeEl && activeEl.$zoomer$){
-                        let zm = activeEl.$zoomer$;
-                        for(let i of zm){
-                            if (i.mapping[act.act]){
-                                i.mapping[act.act](act, activeEl);
+    export function finger(els:any, undef:any):any{
+        let el:any = null;
+        let typ = typeof(els);
+        if (typ == 'string'){
+            if ((window as any).$){
+                els = (window as any).$(els);
+            }else{
+                els = document.querySelector(els);
+            }
+        }
+        if (els.length === undef){
+            els = [els];
+        }
+        for(let el of els){
+            if (!cfg){
+                cfg = touch({
+                    on:{ 
+                        tap:function(act:iact){
+                            activeEl = elAtPos(act.cpos);
+                        }
+                    },onact:function(inq:any){
+                    },onrecognized:function(act:iact){
+                        if (activeEl && activeEl.$zoomer$){
+                            let zm = activeEl.$zoomer$;
+                            for(let i of zm){
+                                if (i.mapping[act.act]){
+                                    i.mapping[act.act](act, activeEl);
+                                }
                             }
                         }
                     }
-                }
-            });
-            cfg.enabled = true;
+                });
+                cfg.enabled = true;
+            }
+            el.$touchable$ = true;
+            all(el, {callback:function(nd:any){nd.$evtignore$ = true;}});
         }
-        el.$touchable$ = true;
-        all(el, {callback:function(nd:any){nd.$evtignore$ = true;}});
         return {
             zoomable:function(){
-                let zoomer = new Zoom(el);
+                for(let el of els){
+                    let zoomer = new Zoom(el);
+                }
                 return this;
             },zsizable:function(){
-                let zsize = new Zsize(el);
+                for(let el of els){
+                    let zsize = new Zsize(el);
+                }
                 return this;
             },draggable:function(){
-                let drag = new Drag(el);
+                for(let el of els){
+                    let drag = new Drag(el);
+                }
                 return this;
             }
         };
