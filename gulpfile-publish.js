@@ -13,8 +13,12 @@ gulp.task('default', function(done){
 
 gulp.task('widget', function(done){
     
-    return gulp.src([
+    gulp.src([
             './dist/**/*.*'
         ])
         .pipe(gulp.dest('../widgetonline.github.io/fingers'));
+    return gulp.src([
+            './dist/**/*.*'
+        ])
+        .pipe(gulp.dest('../../hk/test'));
 });

@@ -20,7 +20,7 @@ gulp.task("default", function(done){
     });
 });
 gulp.task("prod", function(done){
-    runSequence('clean', 'vendor', 'ts:prod', 'publish', function() {
+    runSequence('clean', 'static', 'vendor', 'ts:prod', 'publish', function() {
         done();
     });
 });
