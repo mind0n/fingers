@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+        <title>fingers</title>
+
+        <link rel="stylesheet" type="text/css" href="themes/wo-foundation.css" />
+        <style>
+            *{
+                font:12px arial;
+            }
+            .noselect {
+                -webkit-touch-callout: none; /* iOS Safari */
+                -webkit-user-select: none;   /* Chrome/Safari/Opera */
+                -khtml-user-select: none;    /* Konqueror */
+                -moz-user-select: none;      /* Firefox */
+                -ms-user-select: none;       /* Internet Explorer/Edge */
+                user-select: none;           /* Non-prefixed version, currently not supported by any browser */
+            }
+            .abs{
+                position:absolute;
+            }
+            .tile{
+                display:block;
+                width:64px;
+                height:64px;
+                border:solid 1px silver;
+                background:#6401EC;
+            }
+            .pos-1-1{
+                left:10px;
+                top:10px;
+            }
+            .pos-1-2{
+                left:84px;
+                top:10px;
+            }            
+            .pos-1-3{
+                left:158px;
+                top:10px;
+            }
+            .region{
+                border:solid 1px silver;
+                min-height:200px;
+            }
+            .proxy{
+                position:fixed;
+                min-width:10px;
+                min-height:10px;
+                border:solid 1px blue;
+                background:lightblue;
+            }
+        </style>
+        <script src="scripts/wo-foundation.js"></script>
+        <script src="scripts/fingers.js"></script>
+        <script src="scripts/jquery.js"></script>
+        <script>
+            $(function(){
+                finger('#dzooming').zoomable().draggable();
+                finger('#dsizing').zsizable().draggable();
+                finger('#ddragging').draggable();
+                finger('#dropzone, #dragzone').droppable(function(target){
+                    this.appendChild(target);
+                });
+                finger('#stdrag').draggable().on("dragstart", function(act, el){
+                    el.$proxy.reset();
+                    el.$proxy.style.display = '';
+                    finger(el.$proxy).activate();
+                    el.$proxy.$zoomer$['Drag'].trigger('dragstart', act, el.$proxy);
+                });
+            });
+        </script>
+    </head>
+    <body class="wo">
+        <div id="dzooming" class="tile abs noselect pos-1-1">Zooming</div>
+        <div id="dsizing" class="tile abs noselect pos-1-2">Sizing</div>
+        <div id="ddragging" class="tile abs noselect pos-1-3">Dragging</div>
+        <div class="row" style="margin-top:100px;">
+            <div id='dragzone' class="region col-phone-p-4">
+                <div id="stdrag" class="tile noselect">Static</div>
+            </div>
+            <div id='dropzone' class="region col-phone-p-4 skip-phone-p-4">
+
+            </div>
+        </div>
+    </body>
+</html>

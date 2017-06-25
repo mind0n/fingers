@@ -1,17 +1,24 @@
+// tsconfig.json
 {
-    "compilerOptions": {
-        "jsx": "react",
-        "outDir": "./dist",
-        "sourceMap": true,
-        "noImplicitAny": true,
-        "rootDir": "./src",
-        "module": "commonjs",
-        "target": "es5",
-        "experimentalDecorators": true
-    },
-    "exclude": [
-        "node_modules"
-        , "bower_components"
+  "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": "src",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "module":"commonjs",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "noImplicitAny": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "allowSyntheticDefaultImports": false,
+    "lib": [
+      "dom",
+      "es5",
+      "es2015.promise"
     ]
-
+  }
 }

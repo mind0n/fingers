@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+        <title>fingers</title>
+
+        <link rel="stylesheet" type="text/css" href="vendors.css" />
+        <script src="fingers.js"></script>
+        <style>
+            #raw,#rec{
+                position: fixed;
+                top:4px;
+                bottom:4px;
+                width:160px;
+                overflow: hidden;
+            }
+            #raw .wo-boundary, #rec .wo-boundary{
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+            }
+            #raw{
+                left:4px;
+            }
+            #rec{
+                right:4px;
+            }
+        </style>
+    </head>
+    <body class="w nb">
+        <div id="app">
+            <div id="raw" alias="raw" class="w-widget w-boundary noselect">
+                <div class="w-title">Raw Events</div>
+                <div alias="b"></div>
+            </div>
+            <div id="rec" alias="rec" class="w-widget w-boundary noselect">
+                <div class="w-title">Rec Events</div>
+                <div  alias="b"></div>
+            </div>
+        </div>
+        <!--<w.card id="raw" #raw>
+            <h3 _="title">Raw Events</h3>
+            <div #b _="body"></div>
+        </w.card>
+        <w.card id="rec" #rec>
+            <h3 _="title">Rec Events</h3>
+            <div #b _="body"></div>
+        </w.card>-->
+        <script>
+            touch.contextmenu();
+            var app = document.getElementById('app');
+            w.prepare(app, {});
+            l('raw', app.$raw.$b);
+            l('rec', app.$rec.$b);
+            l('Test', 'raw');
+            l('Test2', 'rec');
+        </script>
+    </body>
+</html>
