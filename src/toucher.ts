@@ -1,8 +1,12 @@
 import {log} from "../../kernel/src/web/debug";
 import {MobileDevice, Browser} from "../../kernel/src/web/device";
-import {all} from "../../kernel/src/common";
+import {all, add} from "../../kernel/src/common";
 import {evtarget, addcss, delcss} from "../../kernel/src/web/element";
-import {TouchContext, TouchElement} from "./touchContext";
+import {TouchItem, TouchElement, TouchContext} from "./touchContext";
+import {Act} from "./act";
+import {simulate} from "../../kernel/src/web/simulate";
+
+
 function pointel(x:number, y:number):Element[]{
     if (document.elementsFromPoint){
         return document.elementsFromPoint(x, y);
@@ -20,7 +24,8 @@ function pointel(x:number, y:number):Element[]{
     });
     return list;
 }
-function getarget(x:number, y:number):TouchItem{
+
+function getarget(x:number, y:number):TouchContext{
     let list = pointel(x, y);
     let titem:TouchElement = null;
     let el = <TouchElement>all(list, (item:TouchElement, i:number)=>{
@@ -31,34 +36,35 @@ function getarget(x:number, y:number):TouchItem{
         }
     });
 
-    return new TouchItem(titem, el);
+    return new TouchContext(titem, el);
 }
-export class TouchItem{
-    constructor(public touched:TouchElement, public context:TouchElement){}
-}
+
 export class Toucher{
-    protected activeContext:TouchContext;
-    protected trapContext:TouchContext;
+    protected context:TouchContext;
     constructor(){
         let istouch = false;
         let self = this;
+        self.context = new TouchContext(null, null);
         if (MobileDevice.any){
             document.addEventListener("touchstart", function(event:TouchEvent){
                 istouch = true;
-                log('Touch Start', 'raw');
                 let touches = event.touches;
-
-                if (!self.activeContext && touches && touches.length == 1){
+                let acts:Act[] = [];
+                if (!self.context.hastouched() && touches && touches.length == 1){
+                    log(`Touch Start ${touches.length}`, 'raw');
                     let t = touches[0];
                     let ti = getarget(t.clientX, t.clientY);
                     self.setcontext(ti);
+                    add(acts, new Act('tstart', [t.clientX, t.clientY], self.context));
+                }else{
+                    acts = self.touchconvert('tstart', event);
                 }
 
                 event.stopPropagation();
             }, true);
             document.addEventListener("touchmove", function(event:TouchEvent){
                 istouch = true;
-                log('Touch Move', 'raw');
+                let acts = self.touchconvert('tmove', event);
                 event.stopPropagation();
                 if (Browser.isSafari){
                     event.preventDefault();
@@ -66,47 +72,76 @@ export class Toucher{
             }, true);
             document.addEventListener("touchend", function(event:TouchEvent){
                 istouch = true;
-                log('Touch End', 'raw');
+                let acts = self.touchconvert('tend', event);
                 event.stopPropagation();
             }, true);
             document.addEventListener("touchcancel", function(event:TouchEvent){
                 istouch = true;
-                log('Touch Cancel', 'raw');
+                let acts = self.touchconvert('tcancel', event);
                 event.stopPropagation();
             }, true);
         }else{
             document.addEventListener("mousedown", function(event:MouseEvent){
                 if (!istouch){
-                    log('Mouse Down', 'raw');
+                    if (event.button == 0){
+                        if (!self.context.hastouched()){
+                            let ti = getarget(event.clientX, event.clientY);
+                            self.setcontext(ti);
+                        }
+                        let acts = self.mouseconvert('tstart', event);
+                    }
                 }
             }, true);
             document.addEventListener("mousemove", function(event:MouseEvent){
                 if (!istouch){
-                    log('Mouse Move', 'raw');
+                    let acts = self.mouseconvert('tmove', event);
                 }
             }, true);
             document.addEventListener("mouseup", function(event:MouseEvent){
                 if (!istouch){
-                    log('Mouse Up', 'raw');
+                    if (event.button == 0){
+                        let acts = self.mouseconvert('tend', event);
+                    }
                 }
             }, true);
             document.addEventListener("mousewheel", function(event:MouseWheelEvent){
                 log('Wheel', 'raw');
+                let acts:Act[] = [];
+                //add(acts, new Act('tstart', [event.clientX, event.clientY], self.context));
             }, true);
             document.addEventListener("DOMMouseScroll", function(event:MouseWheelEvent){
                 log('Firefox Wheel', 'raw');
+                let acts:Act[] = [];
+                //add(acts, new Act('tstart', [event.clientX, event.clientY], self.context));
             }, true);
         }
     }
-    setcontext(ti:TouchItem){
-        if (ti){
-            if (ti.touched){
-                this.activeContext = TouchContext.check(ti.touched);
-            }
-            if (ti.context){
-                this.trapContext = TouchContext.check(ti.context);
-            }
-        }
+    protected mouseconvert(name:string, event:MouseEvent){
+        let self = this;
+        log(`${name}`, 'raw');
+        let acts:Act[] = [];
+        add(acts, new Act(name, [event.clientX, event.clientY], self.context));
+        return acts;
+    }
+    protected touchconvert(name:string, event:TouchEvent){
+        let self = this;
+        let touches = event.touches;
+        log(`${name} ${touches.length}`, 'raw');
+        let acts:Act[] = [];
+        all(touches, (item:Touch, i:number)=>{
+            add(acts, new Act(name, [item.clientX, item.clientY], self.context));
+        });
+        return acts;
+    }
+    clear(){
+        this.context = null;
+    }
+    protected setcontext(ti:TouchContext){
+        this.context.contextel = ti.contextel;
+        this.context.touchel = ti.touchel;
+    }
+    trap(target:any){
+        target.evtrap = true;
     }
     contextmenu(enabled?:boolean){
         document.body.oncontextmenu = function(event){
