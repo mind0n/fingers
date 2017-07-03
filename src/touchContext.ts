@@ -5,6 +5,7 @@ import {Act} from "./act";
 export class TouchContext{
     protected raq:Q;
     protected req:Q;
+    protected recs:any = {};
     hastouched():any{
         return this.touchel;
     }
@@ -13,6 +14,15 @@ export class TouchContext{
         this.req = new Q();
     }
     pushacts(acts:Act[]){
+        this.raq.enq(acts);
+    }
+    registrec(rec:Recognizer){
+        this.recs[rec.name] = rec;
+    }
+}
+
+export class Recognizer{
+    constructor(public name:string){
 
     }
 }
