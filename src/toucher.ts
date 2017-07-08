@@ -137,8 +137,7 @@ export class Toucher{
         this.context = null;
     }
     protected setcontext(ti:TouchContext){
-        this.context.contextel = ti.contextel;
-        this.context.touchel = ti.touchel;
+        this.context.update(ti.touchel, ti.contextel);
     }
     trap(target:any){
         target.evtrap = true;

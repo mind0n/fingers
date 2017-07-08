@@ -1,31 +1,47 @@
 import {log} from "../../kernel/src/web/debug";
 import {MobileDevice, Browser} from "../../kernel/src/web/device";
 import {Act} from "./act";
+import {Q,Recognizer} from "./recognizer";
+import {all, add, NamedFactory, Factory} from "../../kernel/src/common";
+
 
 export class TouchContext{
-    protected raq:Q;
-    protected req:Q;
+
+    protected raq:Q<Act[]>;
+    protected req:Q<Act[]>;
     protected recs:any = {};
+
     hastouched():any{
         return this.touchel;
     }
     constructor(public touchel:TouchElement, public contextel:TouchElement){
-        this.raq = new Q();
-        this.req = new Q();
+        this.raq = new Q<Act[]>();
+        this.req = new Q<Act[]>();
     }
     pushacts(acts:Act[]){
-        this.raq.enq(acts);
+        let raq = this.raq;
+        let req = this.req;
+        raq.enq(acts);
+
+        all(this.recs, (rec:Recognizer, i:any)=>{
+            if (rec.preview(raq)){
+                rec.analyze(raq, req);
+            }
+        });
     }
     registrec(rec:Recognizer){
         this.recs[rec.name] = rec;
     }
-}
-
-export class Recognizer{
-    constructor(public name:string){
-
+    update(target:TouchElement, context:TouchElement){
+        this.contextel = context;
+        this.touchel = target;
+        let recs = this.recs;
+        all(target.recognizers, (rec:Recognizer, i:any)=>{
+            recs[rec.name] = rec;
+        });        
     }
 }
+
 
 export class TouchItem{
     constructor(protected target:TouchElement){
@@ -40,58 +56,6 @@ export class TouchElement extends Element{
     touchContext:TouchItem;
     touchable:boolean = true;
     evtrap:boolean = false;
+    recognizers:string[];
 }
 
-export class Q{
-    protected dat:any[] = [];
-    protected head:number;
-    protected tail:number;
-    
-    constructor(protected size?:number){
-        if (!this.size){
-            this.size = 12;
-        }
-        for(let i=0; i<this.size;i++){
-            this.dat[i] = null;
-        }
-        this.head = 0;
-        this.tail = 0;
-    }
-    
-    enq(item:any, filter?:Function){
-        if (!filter || !filter(this.curt())){
-            this.dat[this.tail] = item;
-        }else{
-            return;
-        }
-        if (this.tail+1>=this.size){
-            this.tail = this.head;
-            this.head++;
-        }else{
-            this.tail++;
-        }
-        if (this.head >= this.size){
-            this.head = 0;
-        }
-    }
-
-    curt(){
-        return this.isempty()?null: this.dat[this.tail];
-    }
-
-    deq(){
-        if (this.isempty()){
-            return null;
-        }
-        let rlt = this.dat[this.tail];
-        this.tail--;
-        if (this.tail<0){
-            this.tail = this.size - 1;
-        }
-        return rlt;
-    }
-
-    isempty(){
-        return this.tail == this.head;
-    }
-}
