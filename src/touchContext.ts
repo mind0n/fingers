@@ -26,6 +26,9 @@ export class TouchContext{
         all(this.recs, (rec:Recognizer, i:any)=>{
             if (rec.preview(raq)){
                 rec.analyze(raq, req);
+                if (rec.hit()){
+                    console.log(rec.name);
+                }
             }
         });
     }
@@ -41,6 +44,14 @@ export class TouchContext{
             let r = Recognizers.instance.get(rec);
             if (r){
                 recs[rec] = r;
+            }
+        });        
+    }
+    reset(){
+        all(this.recs, (rec:Recognizer, i:any)=>{
+            let r = rec
+            if (r){
+                r.reset();
             }
         });        
     }

@@ -153,14 +153,19 @@ export class Toucher{
     disable(){
         this.disabled = true;
     }
+    reset(){
+        if (this.context){this.context.reset();}
+    }
     clear(){
         this.context = null;
     }
     simulate(acts:Act[]){
         this.context.pushacts(acts);
+        return this;
     }
-    protected setcontext(ti:TouchContext){
+    setcontext(ti:TouchContext){
         this.context.update(ti.touchel, ti.contextel);
+        return this;
     }
     trap(target:any){
         target.evtrap = true;

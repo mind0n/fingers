@@ -27,6 +27,14 @@
             #rec{
                 right:4px;
             }
+            .region{
+                position:absolute;
+                left:100px;
+                top:100px;
+                width:100px;
+                height:100px;
+                background: rgba(124,124,124,0.5);
+            }
         </style>
     </head>
     <body class="w nb">
@@ -40,6 +48,7 @@
                 <div  alias="b"></div>
             </div>
         </div>
+        <div class="region" id="btouched">Touched</div>
         <!--<w.card id="raw" #raw>
             <h3 _="title">Raw Events</h3>
             <div #b _="body"></div>
@@ -53,12 +62,23 @@
             touch.contextmenu();
             touch.trap(document.body);
             touch.disable();
+
             var app = document.getElementById('app');
             w.prepare(app, {});
             l('raw', app.$raw.$b);
             l('rec', app.$rec.$b);
             l('Test', 'raw');
             l('Test2', 'rec');
+
+            var btouched = document.getElementById('btouched');
+            btouched.recognizers = ['touched'];
+            btouched.onclick = function(){
+                touch.setcontext({touchel:btouched, contextel:document.body});
+                touch
+                    .simulate([{name:'tstart'}])
+                    .simulate([{name:'tend'}]);
+                touch.reset();
+            }
         </script>
     </body>
 </html>

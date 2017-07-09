@@ -17,6 +17,9 @@ export abstract class Recognizer{
         this.pattern.reset();
     }
     abstract preview(raq:Q<Act[]>):boolean;
+    hit(){
+        return this.pattern.satisfied();
+    }
 }
 
 export class TouchedRecognizer extends Recognizer{
@@ -52,6 +55,7 @@ export class Step{
 export class Steps extends Factory<Step>{
     errored:boolean;
     reset(){
+        this.errored = false;
         all(this.list, (item:Step, i:number)=>{
             item.status = false;
         });
