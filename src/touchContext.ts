@@ -1,7 +1,7 @@
 import {log} from "../../kernel/src/web/debug";
 import {MobileDevice, Browser} from "../../kernel/src/web/device";
 import {Act} from "./act";
-import {Q,Recognizer} from "./recognizer";
+import {Q,Recognizer, Recognizers} from "./recognizer";
 import {all, add, NamedFactory, Factory} from "../../kernel/src/common";
 
 
@@ -36,8 +36,12 @@ export class TouchContext{
         this.contextel = context;
         this.touchel = target;
         let recs = this.recs;
-        all(target.recognizers, (rec:Recognizer, i:any)=>{
-            recs[rec.name] = rec;
+        let recognizers = target?target.recognizers:context.recognizers;
+        all(recognizers, (rec:string, i:any)=>{
+            let r = Recognizers.instance.get(rec);
+            if (r){
+                recs[rec] = r;
+            }
         });        
     }
 }

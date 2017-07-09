@@ -41,6 +41,7 @@ function getarget(x:number, y:number):TouchContext{
 
 export class Toucher{
     protected context:TouchContext;
+    protected disabled:boolean;
     constructor(){
         let istouch = false;
         let self = this;
@@ -48,70 +49,83 @@ export class Toucher{
         if (MobileDevice.any){
             document.addEventListener("touchstart", function(event:TouchEvent){
                 istouch = true;
-                let touches = event.touches;
-                let acts:Act[] = [];
-                if (!self.context.hastouched() && touches && touches.length == 1){
-                    log(`Touch Start ${touches.length}`, 'raw');
-                    let t = touches[0];
-                    let ti = getarget(t.clientX, t.clientY);
-                    self.setcontext(ti);
-                    add(acts, new Act('tstart', [t.clientX, t.clientY], self.context));
-                }else{
-                    acts = self.touchconvert('tstart', event);
-                }
+                if (!self.disabled){
+                    let touches = event.touches;
+                    let acts:Act[] = [];
+                    if (!self.context.hastouched() && touches && touches.length == 1){
+                        log(`Touch Start ${touches.length}`, 'raw');
+                        let t = touches[0];
+                        let ti = getarget(t.clientX, t.clientY);
+                        self.setcontext(ti);
+                        add(acts, new Act('tstart', [t.clientX, t.clientY], self.context));
+                    }else{
+                        acts = self.touchconvert('tstart', event);
+                    }
 
-                event.stopPropagation();
+                    event.stopPropagation();
+                }
             }, true);
             document.addEventListener("touchmove", function(event:TouchEvent){
                 istouch = true;
-                let acts = self.touchconvert('tmove', event);
-                event.stopPropagation();
-                if (Browser.isSafari){
-                    event.preventDefault();
+                if (!self.disabled){
+                    let acts = self.touchconvert('tmove', event);
+                    event.stopPropagation();
+                    if (Browser.isSafari){
+                        event.preventDefault();
+                    }
                 }
             }, true);
             document.addEventListener("touchend", function(event:TouchEvent){
                 istouch = true;
-                let acts = self.touchconvert('tend', event);
-                event.stopPropagation();
+                if (!self.disabled){
+                    let acts = self.touchconvert('tend', event);
+                    event.stopPropagation();
+                }
             }, true);
             document.addEventListener("touchcancel", function(event:TouchEvent){
                 istouch = true;
-                let acts = self.touchconvert('tcancel', event);
-                event.stopPropagation();
+                if (!self.disabled){
+                    let acts = self.touchconvert('tcancel', event);
+                    event.stopPropagation();
+                }
             }, true);
         }else{
             document.addEventListener("mousedown", function(event:MouseEvent){
-                if (!istouch){
+                if (!istouch && !self.disabled){
                     if (event.button == 0){
                         if (!self.context.hastouched()){
                             let ti = getarget(event.clientX, event.clientY);
                             self.setcontext(ti);
                         }
                         let acts = self.mouseconvert('tstart', event);
+                        self.context.pushacts(acts);
                     }
                 }
             }, true);
             document.addEventListener("mousemove", function(event:MouseEvent){
-                if (!istouch){
+                if (!istouch && !self.disabled){
                     let acts = self.mouseconvert('tmove', event);
                 }
             }, true);
             document.addEventListener("mouseup", function(event:MouseEvent){
-                if (!istouch){
+                if (!istouch && !self.disabled){
                     if (event.button == 0){
                         let acts = self.mouseconvert('tend', event);
                     }
                 }
             }, true);
             document.addEventListener("mousewheel", function(event:MouseWheelEvent){
-                log('Wheel', 'raw');
-                let acts:Act[] = [];
+                if (!self.disabled){                
+                    log('Wheel', 'raw');
+                    let acts:Act[] = [];
+                }
                 //add(acts, new Act('tstart', [event.clientX, event.clientY], self.context));
             }, true);
             document.addEventListener("DOMMouseScroll", function(event:MouseWheelEvent){
-                log('Firefox Wheel', 'raw');
-                let acts:Act[] = [];
+                if (!self.disabled){
+                    log('Firefox Wheel', 'raw');
+                    let acts:Act[] = [];
+                }
                 //add(acts, new Act('tstart', [event.clientX, event.clientY], self.context));
             }, true);
         }
@@ -133,8 +147,17 @@ export class Toucher{
         });
         return acts;
     }
+    enable(){
+        this.disabled = false;
+    }
+    disable(){
+        this.disabled = true;
+    }
     clear(){
         this.context = null;
+    }
+    simulate(acts:Act[]){
+        this.context.pushacts(acts);
     }
     protected setcontext(ti:TouchContext){
         this.context.update(ti.touchel, ti.contextel);

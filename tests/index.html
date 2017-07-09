@@ -49,8 +49,10 @@
             <div #b _="body"></div>
         </w.card>-->
         <script>
+            document.body.recognizers = ['touched'];
             touch.contextmenu();
             touch.trap(document.body);
+            touch.disable();
             var app = document.getElementById('app');
             w.prepare(app, {});
             l('raw', app.$raw.$b);

@@ -50,6 +50,7 @@ export class Step{
     }
 }
 export class Steps extends Factory<Step>{
+    errored:boolean;
     reset(){
         all(this.list, (item:Step, i:number)=>{
             item.status = false;
@@ -71,23 +72,25 @@ export class Steps extends Factory<Step>{
             if (!step.status){
                 return true;
             }
-        });
+        }, null, true);
         if (acts.length == step.name.length){
             let rlt = true;
+            let idx = -1;
             all(acts, (act:Act, i:number)=>{
                 let n = step.name[i];
                 if (act.name != n){
                     rlt = false;
+                    idx = i;
                     return true;
                 }
             });
             if (rlt){
                 step.status = true;
-            }else{
-                this.reset();
+            }else if (idx > 0){
+                this.errored = true;
             }
         }else{
-            this.reset();
+            this.errored = true;
         }
     }
 }
@@ -108,7 +111,9 @@ export class Pattern{
     }
     check(acts:Act[]){
         this.q.each((steps:Steps, i:number)=>{
-            steps.check(acts);
+            if (!steps.errored){
+                steps.check(acts);
+            }
         });
     }
     satisfied():boolean{
@@ -162,7 +167,17 @@ export class Q<T>{
     }
 
     curt():T{
-        return this.isempty()?null: this.dat[this.tail];
+        return this.isempty()?null: this.dat[this.index(this.tail - 1)];
+    }
+
+    protected index(n:number){
+        if (this.dat.length < 1 || n>=this.dat.length){
+            return 0;
+        }
+        if (n<0){
+            return this.dat.length - 1;
+        }
+        return n;
     }
 
     deq():T{
@@ -182,8 +197,18 @@ export class Q<T>{
     }
 
     each(handler:Function){
-        all(this.dat, (item:T, i:number)=>{
-            handler(item, i);
-        });
+        let p = this.head;
+        while(p != this.tail){
+            let item = this.dat[p];
+            handler(item, p);
+            p = this.index(p+1);
+        }
+        // all(this.dat, (item:T, i:number)=>{
+        //     if (item){
+        //         handler(item, i);
+        //     }else{
+        //         return true;
+        //     }
+        // });
     }
 }
