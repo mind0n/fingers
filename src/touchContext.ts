@@ -1,7 +1,8 @@
 import {log} from "../../kernel/src/web/debug";
 import {MobileDevice, Browser} from "../../kernel/src/web/device";
 import {Act} from "./act";
-import {Q,Recognizer, Recognizers} from "./recognizer";
+import {Recognizer, Recognizers} from "./recognizer";
+import {Q} from "./Q";
 import {all, add, NamedFactory, Factory} from "../../kernel/src/common";
 
 

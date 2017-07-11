@@ -76,7 +76,8 @@
                 touch.setcontext({touchel:btouched, contextel:document.body});
                 touch
                     .simulate([{name:'tstart'}])
-                    .simulate([{name:'tend'}]);
+                    .simulate([{name:'tmove'}])
+                    .simulate([{name:'tmove'}])
                 touch.reset();
             }
         </script>
