@@ -38,7 +38,7 @@ export class TouchedRecognizer extends Recognizer{
             this.isactive = false;
         }
 
-        if (this.isactive || (curt.length == 1 && curt[0].name == 'tstart')){
+        if (this.isactive || (curt && curt.length == 1 && curt[0].name == 'tstart')){
             this.isactive = true;
             return true;
         }
@@ -58,7 +58,7 @@ export class DragStartRecognizer extends Recognizer{
     }
     preview(raq:Q<Act[]>, req?:Q<Act>){
         let curt = raq.curt();
-        if (this.isactive || (curt.length == 1 && curt[0].name == 'tstart')){
+        if (this.isactive || (curt && curt.length == 1 && curt[0].name == 'tstart')){
             this.isactive = true;
             return true;
         }
@@ -112,7 +112,7 @@ export class DroppedRecognizer extends Recognizer{
     }
     analyze(raq:Q<Act[]>, req:Q<Act>){
         let curt = req.curt();
-        if (curt.name == 'dragging'){
+        if (curt && curt.name == 'dragging'){
             this.pattern.check(raq.curt());
         }else{
             this.pattern.error();

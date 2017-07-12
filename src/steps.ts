@@ -40,7 +40,7 @@ export class Steps extends Factory<Step>{
         if (!step){
             this.errored = true;
         }else{
-            if (acts.length == step.name.length){
+            if (acts && acts.length == step.name.length){
                 let rlt = true;
                 let idx = -1;
                 all(acts, (act:Act, i:number)=>{

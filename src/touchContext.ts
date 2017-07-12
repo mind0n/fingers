@@ -52,6 +52,8 @@ export class TouchContext{
         });        
     }
     reset(){
+        this.raq.clear();
+        this.req.clear();
         all(this.recs, (rec:Recognizer, i:any)=>{
             let r = rec
             if (r){

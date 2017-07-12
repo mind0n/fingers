@@ -1,4 +1,4 @@
-import {all, add, NamedFactory, Factory} from "../../kernel/src/common";
+import {all, add, NamedFactory, Factory, clear} from "../../kernel/src/common";
 import {Act} from "./act";
 
 export class Q<T>{
@@ -10,11 +10,7 @@ export class Q<T>{
         if (!this.size){
             this.size = 12;
         }
-        for(let i=0; i<this.size;i++){
-            this.dat[i] = null;
-        }
-        this.head = 0;
-        this.tail = 0;
+        this.clear();
     }
     
     enq(item:T, filter?:Function){
@@ -63,6 +59,14 @@ export class Q<T>{
     isempty():boolean{
         return this.tail == this.head;
     }
+
+    clear(){
+        clear(this.dat);
+        for(let i=0; i<this.size;i++){
+            this.dat[i] = null;
+        }
+        this.head = 0;
+        this.tail = 0;    }
 
     each(handler:Function){
         let p = this.head;
