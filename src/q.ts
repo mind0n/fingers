@@ -19,14 +19,9 @@ export class Q<T>{
         }else{
             return;
         }
-        if (this.tail+1>=this.size){
-            this.tail = this.head;
-            this.head++;
-        }else{
-            this.tail++;
-        }
-        if (this.head >= this.size){
-            this.head = 0;
+        this.tail = this.index(this.tail + 1);
+        if (this.tail == this.head){
+            this.head = this.index(this.head + 1);
         }
     }
 
@@ -49,10 +44,7 @@ export class Q<T>{
             return null;
         }
         let rlt = this.dat[this.tail];
-        this.tail--;
-        if (this.tail<0){
-            this.tail = this.size - 1;
-        }
+        this.tail = this.index(this.tail - 1);
         return rlt;
     }
 
