@@ -9,7 +9,7 @@ import {all, add, NamedFactory, Factory} from "../../kernel/src/common";
 export class TouchContext{
 
     protected raq:Q<Act[]>;
-    protected req:Q<Act[]>;
+    protected req:Q<Act>;
     protected recs:any = {};
 
     hastouched():any{
@@ -17,7 +17,7 @@ export class TouchContext{
     }
     constructor(public touchel:TouchElement, public contextel:TouchElement){
         this.raq = new Q<Act[]>();
-        this.req = new Q<Act[]>();
+        this.req = new Q<Act>();
     }
     pushacts(acts:Act[]){
         let raq = this.raq;
@@ -25,10 +25,13 @@ export class TouchContext{
         raq.enq(acts);
 
         all(this.recs, (rec:Recognizer, i:any)=>{
-            if (rec.preview(raq)){
+            if (rec.preview(raq, req)){
                 rec.analyze(raq, req);
                 if (rec.hit()){
                     console.log(rec.name);
+                    let a = new Act(rec.name, [], this);
+                    this.req.enq(a);
+                    return true;
                 }
             }
         });

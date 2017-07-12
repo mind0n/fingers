@@ -1,17 +1,16 @@
 import {definitions} from "../../kernel/src/web/definition";
 import {Toucher} from "./toucher";
 import {Widget} from "../../kernel/src/web/widgets/widget";
-import {Recognizers
-    , TouchedRecognizer
-    , DragStartRecognizer
-} from "./recognizer";
+import * as R from "./recognizer";
 
 definitions();
 
 let w:any = window;
 
-Recognizers.instance.regist('touched', new TouchedRecognizer());
-Recognizers.instance.regist('dragstart', new DragStartRecognizer());
+R.Recognizers.instance.regist('touched', new R.TouchedRecognizer());
+R.Recognizers.instance.regist('dropped', new R.DroppedRecognizer());
+R.Recognizers.instance.regist('dragging', new R.DraggingRecognizer());
+R.Recognizers.instance.regist('dragstart', new R.DragStartRecognizer());
 
 let t = new Toucher();
 w.touch = t;

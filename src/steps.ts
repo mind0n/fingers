@@ -29,32 +29,36 @@ export class Steps extends Factory<Step>{
         all(this.list, (item:Step, i:number)=>{
             rlt = rlt && item.status;
         });
-        return rlt;
+        return rlt && !this.errored;
     }
-    check(acts:Act[]){
+    check(acts:Act[], repeat?:boolean){
         let step = <Step>all(this.list, (step:Step, i:number)=>{
             if (!step.status){
                 return true;
             }
-        }, null, true);
-        if (acts.length == step.name.length){
-            let rlt = true;
-            let idx = -1;
-            all(acts, (act:Act, i:number)=>{
-                let n = step.name[i];
-                if (act.name != n){
-                    rlt = false;
-                    idx = i;
-                    return true;
+        }, null, repeat);
+        if (!step){
+            this.errored = true;
+        }else{
+            if (acts.length == step.name.length){
+                let rlt = true;
+                let idx = -1;
+                all(acts, (act:Act, i:number)=>{
+                    let n = step.name[i];
+                    if (act.name != n){
+                        rlt = false;
+                        idx = i;
+                        return true;
+                    }
+                });
+                if (rlt){
+                    step.status = true;
+                }else if (idx > 0){
+                    this.errored = true;
                 }
-            });
-            if (rlt){
-                step.status = true;
-            }else if (idx > 0){
+            }else{
                 this.errored = true;
             }
-        }else{
-            this.errored = true;
         }
     }
 }
@@ -73,10 +77,15 @@ export class Pattern{
         curt.add(name);
         return this;
     }
-    check(acts:Act[]){
+    error(){
+        this.q.each((item:Steps, i:number)=>{
+            item.errored = true;
+        });
+    }
+    check(acts:Act[], repeat?:boolean){
         this.q.each((steps:Steps, i:number)=>{
             if (!steps.errored){
-                steps.check(acts);
+                steps.check(acts, repeat);
             }
         });
     }

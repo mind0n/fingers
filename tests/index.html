@@ -58,7 +58,7 @@
             <div #b _="body"></div>
         </w.card>-->
         <script>
-            document.body.recognizers = ['touched'];
+            //document.body.recognizers = ['touched', 'dragstart'];
             touch.contextmenu();
             touch.trap(document.body);
             touch.disable();
@@ -71,13 +71,16 @@
             l('Test2', 'rec');
 
             var btouched = document.getElementById('btouched');
-            btouched.recognizers = ['touched'];
+            btouched.recognizers = ['touched', 'dragstart', 'dragging', 'dropped'];
             btouched.onclick = function(){
                 touch.setcontext({touchel:btouched, contextel:document.body});
                 touch
                     .simulate([{name:'tstart'}])
                     .simulate([{name:'tmove'}])
                     .simulate([{name:'tmove'}])
+                    .simulate([{name:'tmove'}])
+                    .simulate([{name:'tmove'}])
+                    .simulate([{name:'tend'}])
                 touch.reset();
             }
         </script>
