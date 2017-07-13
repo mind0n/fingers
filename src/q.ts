@@ -58,7 +58,8 @@ export class Q<T>{
             this.dat[i] = null;
         }
         this.head = 0;
-        this.tail = 0;    }
+        this.tail = 0;    
+    }
 
     each(handler:Function){
         let p = this.head;
