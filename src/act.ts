@@ -5,12 +5,16 @@ import {evtarget, addcss, delcss} from "../../kernel/src/web/element";
 import {TouchItem, TouchElement, TouchContext} from "./touchContext";
 
 export class Act{
-    time:Date;
     constructor(public name:string
     , public pos:number[]
     , public context:TouchContext
+    , public time?:Date
     ){
-        this.time = new Date();
+        this.time = time || new Date();
+    }
+    copy(name?:string):Act{
+        let rlt = new Act(name || this.name, [this.pos[0], this.pos[1]], this.context, this.time);
+        return rlt;
     }
     destroy(){
         this.context = null;

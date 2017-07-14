@@ -1,4 +1,4 @@
-import {all, add, NamedFactory, Factory} from "../../kernel/src/common";
+import {all, add, diff, NamedFactory, Factory} from "../../kernel/src/common";
 import {Act} from "./act";
 import {Pattern, Step, Steps} from "./steps";
 import {Q} from "./q";
@@ -21,6 +21,12 @@ export abstract class Recognizer{
     abstract preview(raq:Q<Act[]>, req?:Q<Act>):boolean;
     hit(){
         return this.pattern.satisfied();
+    }
+    parse(acts:Act[]){
+        if (acts && acts.length > 0){
+            return acts[0].copy(this.name);
+        }
+        return null;
     }
 }
 
@@ -116,6 +122,37 @@ export class DroppedRecognizer extends Recognizer{
             this.pattern.check(raq.curt());
         }else{
             this.pattern.error();
+        }
+    }
+}
+
+export class DblTouchedRecognizer extends Recognizer{
+    protected firstouched:Act;
+    constructor(){
+        super('dbltouched');
+        this.pattern
+            .create().add(['touched']).add(['touched']);
+    }
+    preview(raq:Q<Act[]>, req?:Q<Act>){
+        let curt = req.curt();
+        if (this.isactive || (curt && curt.name == 'touched')){
+            this.isactive = true;
+            return true;
+        }
+        return false;
+    }
+    analyze(raq:Q<Act[]>, req:Q<Act>){
+        let curt = req.curt();
+        if (!this.firstouched){
+            this.firstouched = curt;
+        }else{
+            let d = diff(curt.time, this.firstouched.time);
+            if (d<200){
+                this.pattern.check([curt]);
+                this.pattern.check([this.firstouched]);
+            }else{
+                this.pattern.error();
+            }
         }
     }
 }

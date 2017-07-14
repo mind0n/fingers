@@ -159,8 +159,12 @@ export class Toucher{
     clear(){
         this.context = null;
     }
-    simulate(acts:Act[]){
-        this.context.pushacts(acts);
+    simulate(acts:any[]){
+        let list:Act[] = [];
+        all(acts, (item:any, i:number)=>{
+            add(list, new Act(item.name, item.pos || [], this.context, item.time));
+        });
+        this.context.pushacts(list);
         return this;
     }
     setcontext(ti:TouchContext){

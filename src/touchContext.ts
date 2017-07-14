@@ -28,8 +28,8 @@ export class TouchContext{
             if (rec.preview(raq, req)){
                 rec.analyze(raq, req);
                 if (rec.hit()){
-                    console.log(rec.name);
-                    let a = new Act(rec.name, [], this);
+                    let a = rec.parse(acts); //new Act(rec.name, [], this);
+                    console.log(a.name, a.time);
                     this.req.enq(a);
                     return true;
                 }

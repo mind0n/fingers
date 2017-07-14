@@ -71,12 +71,14 @@
             l('Test2', 'rec');
 
             var btouched = document.getElementById('btouched');
-            btouched.recognizers = ['touched', 'dragstart', 'dragging', 'dropped'];
+            btouched.recognizers = ['touched', 'dragstart', 'dragging', 'dropped', 'dbltouched'];
             btouched.onclick = function(){
                 touch.setcontext({touchel:btouched, contextel:document.body});
                 touch
                     .simulate([{name:'tstart'}])
                     .simulate([{name:'tmove'}])
+                    .simulate([{name:'tend'}])
+                    .simulate([{name:'tstart'}])
                     .simulate([{name:'tend'}])
                     .simulate([{name:'tstart'}])
                     .simulate([{name:'tmove'}])
