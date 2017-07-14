@@ -54,7 +54,7 @@ export class DragStartRecognizer extends Recognizer{
     constructor(){
         super('dragstart');
         this.pattern
-            .create().add(['tstart']).add(['tmove']).add(['tmove']);
+            .create().add(['tstart']).add(['tmove']).add(['tmove']).add(['tmove']);
     }
     preview(raq:Q<Act[]>, req?:Q<Act>){
         let curt = raq.curt();
