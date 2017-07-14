@@ -15,7 +15,7 @@ export class TouchContext{
     hastouched():any{
         return this.touchel;
     }
-    constructor(public touchel:TouchElement, public contextel:TouchElement){
+    constructor(public touchel:TouchElement, public contextel:TouchElement, public activel:TouchElement){
         this.raq = new Q<Act[]>();
         this.req = new Q<Act>();
     }
@@ -23,11 +23,12 @@ export class TouchContext{
         let raq = this.raq;
         let req = this.req;
         raq.enq(acts);
-
+        let hit = false;
         all(this.recs, (rec:Recognizer, i:any)=>{
             if (rec.preview(raq, req)){
                 rec.analyze(raq, req);
                 if (rec.hit()){
+                    hit = true;
                     let a = rec.parse(acts); //new Act(rec.name, [], this);
                     console.log(a.name, a.time);
                     this.req.enq(a);
@@ -35,13 +36,24 @@ export class TouchContext{
                 }
             }
         });
+
+        if (hit){
+            let act = this.req.curt();
+            if (act.accurate){
+                this.touchel.trigger(act);
+            }else{
+                this.activel.trigger(act);
+            }
+            return act;
+        }
     }
     registrec(rec:Recognizer){
         this.recs[rec.name] = rec;
     }
     update(target:TouchElement, context:TouchElement){
         this.contextel = context;
-        this.touchel = target;
+        this.touchel = target || context;
+        this.activel = this.activel || target || context;
         let recs = this.recs;
         let recognizers = target?target.recognizers:context.recognizers;
         all(recognizers, (rec:string, i:any)=>{
@@ -78,5 +90,8 @@ export class TouchElement extends Element{
     touchable:boolean = true;
     evtrap:boolean = false;
     recognizers:string[];
+    trigger(act:Act){
+
+    }
 }
 

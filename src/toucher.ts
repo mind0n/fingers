@@ -29,10 +29,10 @@ function getarget(x:number, y:number):TouchContext{
     let list = pointel(x, y);
     let titem:TouchElement = null;
     let el = <TouchElement>all(list, (item:TouchElement, i:number)=>{
-        if (item.touchable && !titem){
-            titem = item;
-        }else if (item.evtrap){
+        if (item.evtrap){
             return true;
+        }else if (item.touchable && !titem){
+            titem = item;
         }
     });
 

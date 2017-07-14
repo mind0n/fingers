@@ -10,8 +10,10 @@ export class Recognizers{
 export abstract class Recognizer{
     protected isactive:boolean;
     protected pattern:Pattern;
-    constructor(public name:string){
+    protected accurate:boolean;
+    constructor(public name:string, accurate?:boolean){
         this.pattern = new Pattern();
+        this.accurate = accurate;
     }
     abstract analyze(raq:Q<Act[]>, req:Q<Act>):void;
     reset(){
@@ -24,7 +26,7 @@ export abstract class Recognizer{
     }
     parse(acts:Act[]){
         if (acts && acts.length > 0){
-            return acts[0].copy(this.name);
+            return acts[0].copy(this.name, this.accurate);
         }
         return null;
     }
@@ -32,7 +34,7 @@ export abstract class Recognizer{
 
 export class TouchedRecognizer extends Recognizer{
     constructor(){
-        super('touched');
+        super('touched', true);
         this.pattern
             .create().add(['tstart']).add(['tend'])
             .create().add(['tstart']).add(['tmove']).add(['tend']);
