@@ -8,9 +8,9 @@ definitions();
 let w:any = window;
 
 R.Recognizers.instance.regist('touched', new R.TouchedRecognizer());
-R.Recognizers.instance.regist('dropped', new R.DroppedRecognizer());
 R.Recognizers.instance.regist('dragging', new R.DraggingRecognizer());
 R.Recognizers.instance.regist('dragstart', new R.DragStartRecognizer());
+R.Recognizers.instance.regist('dropped', new R.DroppedRecognizer());
 R.Recognizers.instance.regist('dbltouched', new R.DblTouchedRecognizer());
 
 let t = new Toucher();

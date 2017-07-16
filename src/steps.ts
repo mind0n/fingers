@@ -82,6 +82,13 @@ export class Pattern{
             item.errored = true;
         });
     }
+    iserrored(){
+        return this.q.each((item:Steps, i:number)=>{
+            if (item.errored){
+                return true;
+            }
+        });
+    }
     check(acts:Act[], repeat?:boolean){
         this.q.each((steps:Steps, i:number)=>{
             if (!steps.errored){

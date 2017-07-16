@@ -15,7 +15,7 @@ export class TouchContext{
     hastouched():any{
         return this.touchel;
     }
-    constructor(public touchel:TouchElement, public contextel:TouchElement, public activel:TouchElement){
+    constructor(public touchel:TouchElement, public contextel:TouchElement, public activel?:TouchElement){
         this.raq = new Q<Act[]>();
         this.req = new Q<Act>();
     }
@@ -24,19 +24,22 @@ export class TouchContext{
         let req = this.req;
         raq.enq(acts);
         let hit = false;
+
         all(this.recs, (rec:Recognizer, i:any)=>{
-            if (rec.preview(raq, req)){
+            if (!rec.errored() && rec.preview(raq, req)){
                 rec.analyze(raq, req);
                 if (rec.hit()){
                     hit = true;
                     let a = rec.parse(acts); //new Act(rec.name, [], this);
-                    console.log(a.name, a.time);
+                    //console.log(a.name, a.time);
                     this.req.enq(a);
                     return true;
                 }
             }
         });
-
+        TouchElement.check(this.touchel);
+        TouchElement.check(this.contextel);
+        TouchElement.check(this.activel);
         if (hit){
             let act = this.req.curt();
             if (act.accurate){
@@ -54,6 +57,15 @@ export class TouchContext{
         this.contextel = context;
         this.touchel = target || context;
         this.activel = this.activel || target || context;
+        TouchElement.check(this.touchel);
+        TouchElement.check(this.contextel);
+        TouchElement.check(this.activel);
+        // if (!this.activel){
+        //     this.activel = this.touchel;
+        // }
+        // if (!this.touchel || !this.activel){
+        //     debugger;
+        // }
         let recs = this.recs;
         let recognizers = target?target.recognizers:context.recognizers;
         all(recognizers, (rec:string, i:any)=>{
@@ -85,13 +97,21 @@ export class TouchItem{
     }
 }
 
-export class TouchElement extends Element{
+export abstract class TouchElement extends Element{
+    static check(target:TouchElement){
+        if (target && !target.trigger){
+            target.trigger = function(act:Act){
+                let el = <any>this;
+                if (el[`on${act.name}`]){
+                    el[`on${act.name}`](act);
+                }
+            };
+        }
+    }
     touchContext:TouchItem;
     touchable:boolean = true;
     evtrap:boolean = false;
     recognizers:string[];
-    trigger(act:Act){
-
-    }
+    abstract trigger(act:Act):void;
 }
 

@@ -24,6 +24,9 @@ export abstract class Recognizer{
     hit(){
         return this.pattern.satisfied();
     }
+    errored(){
+        return this.pattern.iserrored();
+    }
     parse(acts:Act[]){
         if (acts && acts.length > 0){
             return acts[0].copy(this.name, this.accurate);
@@ -112,7 +115,8 @@ export class DroppedRecognizer extends Recognizer{
     }
     preview(raq:Q<Act[]>, req?:Q<Act>){
         let curt = raq.curt();
-        if (this.isactive || (curt && curt.length > 0 && curt[0].name == 'tend')){
+        let ecurt = req.curt();
+        if (this.isactive || (curt && curt.length > 0 && curt[0].name == 'tend' && ecurt.name == 'dragging')){
             this.isactive = true;
             return true;
         }
@@ -121,7 +125,8 @@ export class DroppedRecognizer extends Recognizer{
     analyze(raq:Q<Act[]>, req:Q<Act>){
         let curt = req.curt();
         if (curt && curt.name == 'dragging'){
-            this.pattern.check(raq.curt());
+            let raw = raq.curt();
+            this.pattern.check(raw);
         }else{
             this.pattern.error();
         }

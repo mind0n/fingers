@@ -70,7 +70,28 @@
             l('Test', 'raw');
             l('Test2', 'rec');
 
+            function trigger(act){
+                console.log('triggered', act.name);
+            }
+
             var btouched = document.getElementById('btouched');
+            btouched.touchable = true;
+            btouched.ontouched = function(act){
+                trigger(act);
+            }
+            btouched.ondragstart = function(act){
+                trigger(act);
+            }
+            btouched.ondragging = function(act){
+                trigger(act);
+            }
+            btouched.ondropped = function(act){
+                trigger(act);
+            }
+            btouched.ondbltouched = function(act){
+                trigger(act);
+            }
+
             btouched.recognizers = ['touched', 'dragstart', 'dragging', 'dropped', 'dbltouched'];
             btouched.onclick = function(){
                 touch.setcontext({touchel:btouched, contextel:document.body});
