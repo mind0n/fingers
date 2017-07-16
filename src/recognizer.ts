@@ -116,7 +116,9 @@ export class DroppedRecognizer extends Recognizer{
     preview(raq:Q<Act[]>, req?:Q<Act>){
         let curt = raq.curt();
         let ecurt = req.curt();
-        if (this.isactive || (curt && curt.length > 0 && curt[0].name == 'tend' && ecurt.name == 'dragging')){
+        if (this.isactive 
+            || (curt && curt.length == 1 && curt[0].name == 'tend' && ecurt.name == 'dragging')
+            || (curt && curt.length > 1 && ecurt.name == 'dragging')){
             this.isactive = true;
             return true;
         }
@@ -126,7 +128,7 @@ export class DroppedRecognizer extends Recognizer{
         let curt = req.curt();
         if (curt && curt.name == 'dragging'){
             let raw = raq.curt();
-            this.pattern.check(raw);
+            this.pattern.check(raw.length==1?raw:[new Act('tend', raw[0].pos, raw[0].context)]);
         }else{
             this.pattern.error();
         }

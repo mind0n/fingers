@@ -108,6 +108,19 @@
                     .simulate([{name:'tmove'}])
                     .simulate([{name:'tend'}])
                 touch.reset();
+                touch
+                    .simulate([{name:'tstart'}])
+                    .simulate([{name:'tmove'}])
+                    .simulate([{name:'tmove'}])
+                    .simulate([{name:'tmove'}])
+                    .simulate([{name:'tmove'}])
+                    .simulate([{name:'tmove'}, {name:'tstart'}])
+                    .simulate([{name:'tmove'}, {name:'tmove'}])
+                    .simulate([{name:'tmove'}, {name:'tmove'}])
+                    .simulate([{name:'tmove'}, {name:'tmove'}])
+                    .simulate([{name:'tend'}, {name:'tmove'}])
+                    .simulate([{name:'tend'}]);
+                touch.reset();
             }
         </script>
     </body>
