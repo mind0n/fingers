@@ -202,7 +202,8 @@ export class PinchMoveRecognizer extends Recognizer{
     }
     preview(raq:Q<Act[]>, req?:Q<Act>){
         let curt = raq.curt();
-        if (curt.length == 2){
+        let ecurt = req.curt();
+        if (ecurt && curt.length == 2){
             let a = curt[0];
             let b = curt[1];
             if (a.name == 'tmove' && b.name == 'tmove'){
@@ -234,7 +235,7 @@ export class PinchEndRecognizer extends Recognizer{
     preview(raq:Q<Act[]>, req?:Q<Act>){
         let curt = raq.curt();
         let ecurt = req.curt();
-        if (curt.length == 1 && ecurt.name == 'pinchmove'){
+        if (ecurt && curt.length == 1 && ecurt.name == 'pinchmove'){
             return true;
         }else if (curt.length == 2){
             let a = curt[0];

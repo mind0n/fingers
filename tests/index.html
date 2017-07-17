@@ -91,8 +91,26 @@
             btouched.ondbltouched = function(act){
                 trigger(act);
             }
+            btouched.onpinchstart = function(act){
+                trigger(act);
+            }
+            btouched.onpinchmove = function(act){
+                trigger(act);
+            }
+            btouched.onpinchend = function(act){
+                trigger(act);
+            }
 
-            btouched.recognizers = ['touched', 'dragstart', 'dragging', 'dropped', 'dbltouched'];
+            btouched.recognizers = [
+                'touched'
+                , 'dragstart'
+                , 'dragging'
+                , 'dropped'
+                , 'dbltouched'
+                , 'pinchstart'
+                , 'pinchmove'
+                , 'pinchend'
+                ];
             btouched.onclick = function(){
                 touch.setcontext({touchel:btouched, contextel:document.body});
                 touch
