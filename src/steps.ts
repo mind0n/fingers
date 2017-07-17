@@ -63,7 +63,8 @@ export class Steps extends Factory<Step>{
     }
 }
 export class Pattern{
-    protected q:Q<Steps>
+    protected q:Q<Steps>;
+    protected isatisfied:boolean;
     constructor(){
         this.q = new Q<Steps>();
     }
@@ -78,6 +79,7 @@ export class Pattern{
         return this;
     }
     error(){
+        this.isatisfied = false;
         this.q.each((item:Steps, i:number)=>{
             item.errored = true;
         });
@@ -96,17 +98,23 @@ export class Pattern{
             }
         });
     }
+    satisfy(){
+        this.isatisfied = true;
+    }
     satisfied():boolean{
-        let rlt = false;
-        this.q.each((item:Steps, i:number)=>{
-            if (item.arrived()){
-                rlt = true;
-                return true;
-            }
-        });
+        let rlt = this.isatisfied;
+        if (!rlt){
+            this.q.each((item:Steps, i:number)=>{
+                if (item.arrived()){
+                    rlt = true;
+                    return true;
+                }
+            });
+        }
         return rlt;
     }
     reset(){
+        this.isatisfied = false;
         this.q.each((item:Steps, i:number)=>{
             item.reset();
         });

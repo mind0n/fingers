@@ -165,3 +165,93 @@ export class DblTouchedRecognizer extends Recognizer{
         }
     }
 }
+
+export class PinchStartRecognizer extends Recognizer{
+    constructor(){
+        super('pinchstart');
+        this.pattern
+            .create().add(['tmove', 'tmove']);
+    }
+    preview(raq:Q<Act[]>, req?:Q<Act>){
+        let curt = raq.curt();
+        if (curt.length == 2){
+            let a = curt[0];
+            let b = curt[0];
+            if (a.name == 'tmove' && b.name == 'tmove'){
+                return true;
+            }
+        }
+        return false;
+    }
+    analyze(raq:Q<Act[]>, req:Q<Act>){
+        let curt = req.curt();
+        let acurt = raq.curt();
+        if (!curt || (curt.name != 'pinchstart' && curt.name != 'pinchmove')){
+            this.pattern.check(acurt);
+        }else{
+            this.pattern.error();
+        }
+    }
+}
+
+export class PinchMoveRecognizer extends Recognizer{
+    constructor(){
+        super('pinchmove');
+        this.pattern
+            .create().add(['tmove', 'tmove']);
+    }
+    preview(raq:Q<Act[]>, req?:Q<Act>){
+        let curt = raq.curt();
+        if (curt.length == 2){
+            let a = curt[0];
+            let b = curt[1];
+            if (a.name == 'tmove' && b.name == 'tmove'){
+                return true;
+            }
+        }
+        return false;
+    }
+    analyze(raq:Q<Act[]>, req:Q<Act>){
+        let curt = req.curt();
+        let acurt = raq.curt();
+        if (curt && (curt.name != 'pinchend')){
+            this.pattern.check(acurt);
+        }else{
+            this.pattern.error();
+        }
+    }
+}
+
+export class PinchEndRecognizer extends Recognizer{
+    constructor(){
+        super('pinchend');
+        this.pattern
+            .create().add(['tstart'])
+            .create().add(['tmove'])
+            .create().add(['tend'])
+            ;
+    }
+    preview(raq:Q<Act[]>, req?:Q<Act>){
+        let curt = raq.curt();
+        let ecurt = req.curt();
+        if (curt.length == 1 && ecurt.name == 'pinchmove'){
+            return true;
+        }else if (curt.length == 2){
+            let a = curt[0];
+            let b = curt[1];
+            if (a.name == 'tend' || b.name == 'tend'){
+                return true;
+            }
+        }
+        return false;
+    }
+    analyze(raq:Q<Act[]>, req:Q<Act>){
+        let curt = req.curt();
+        let acurt = raq.curt();
+        if (curt && (curt.name == 'pinchmove' || curt.name == 'pinchstart')){
+            this.pattern.satisfy();
+        }else{
+            this.pattern.error();
+        }
+    }
+}
